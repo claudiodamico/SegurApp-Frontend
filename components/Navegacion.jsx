@@ -19,8 +19,6 @@ const Navegacion = () => {
       focusedIcon: 'home',
       unfocusedIcon: 'home-outline',
     },
-    {key: 'albums', title: 'Albums', focusedIcon: 'album'},
-    {key: 'recents', title: 'Recents', focusedIcon: 'history'},
     {
       key: 'notifications',
       title: 'Notifications',
