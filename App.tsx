@@ -1,28 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-import {
   HubConnection,
   HubConnectionBuilder,
   LogLevel,
 } from '@microsoft/signalr';
-import VoiceRecognition from './components/VoiceInput';
 import {MD3LightTheme as DefaultTheme, PaperProvider} from 'react-native-paper';
 import Navegacion from './components/Navegacion';
 

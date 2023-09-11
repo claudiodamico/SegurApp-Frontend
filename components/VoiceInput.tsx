@@ -50,11 +50,24 @@ const VoiceRecognition: React.FC = () => {
   };
 
   return (
-    <View>
-      <Button mode="elevated" icon="camera" onPress={toggleListening}>
+    <View
+      style={{
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1,
+      }}>
+      <Button
+        mode="elevated"
+        icon={isListening ? 'record-circle' : 'microphone'}
+        onPress={toggleListening}>
         {isListening ? 'Stop Listening' : 'Start Listening'}
       </Button>
-      <Text>Recognized Text: {recognizedText}</Text>
+      <Text
+        style={{
+          marginTop: 10,
+        }}>
+        {recognizedText}
+      </Text>
     </View>
   );
 };

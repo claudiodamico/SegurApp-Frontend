@@ -1,12 +1,8 @@
 import * as React from 'react';
-import {BottomNavigation, Text} from 'react-native-paper';
+import {Appbar, BottomNavigation, Text} from 'react-native-paper';
 import VoiceRecognition from './VoiceInput';
 
 const Home = () => <VoiceRecognition />;
-
-const AlbumsRoute = () => <Text>Albums</Text>;
-
-const RecentsRoute = () => <Text>Recents</Text>;
 
 const NotificationsRoute = () => <Text>Notifications</Text>;
 
@@ -15,7 +11,7 @@ const Navegacion = () => {
   const [routes] = React.useState([
     {
       key: 'home',
-      title: 'Inicio',
+      title: 'Home',
       focusedIcon: 'home',
       unfocusedIcon: 'home-outline',
     },
@@ -29,17 +25,20 @@ const Navegacion = () => {
 
   const renderScene = BottomNavigation.SceneMap({
     home: Home,
-    albums: AlbumsRoute,
-    recents: RecentsRoute,
     notifications: NotificationsRoute,
   });
 
   return (
-    <BottomNavigation
-      navigationState={{index, routes}}
-      onIndexChange={setIndex}
-      renderScene={renderScene}
-    />
+    <>
+      <Appbar.Header>
+        <Appbar.Content title={routes[index].title} />
+      </Appbar.Header>
+      <BottomNavigation
+        navigationState={{index, routes}}
+        onIndexChange={setIndex}
+        renderScene={renderScene}
+      />
+    </>
   );
 };
 
