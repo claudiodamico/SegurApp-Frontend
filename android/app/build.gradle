@@ -73,9 +73,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.projectclean"
+    namespace "com.SegurApp"
     defaultConfig {
-        applicationId "com.projectclean"
+        applicationId "com.SegurApp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

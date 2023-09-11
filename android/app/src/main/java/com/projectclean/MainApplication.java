@@ -1,4 +1,4 @@
-package com.projectclean;
+package com.SegurApp;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

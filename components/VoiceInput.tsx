@@ -23,9 +23,10 @@ const VoiceRecognition: React.FC = () => {
 
     Voice.onSpeechError = e => {};
 
-    Voice.onSpeechResults = (e: any) => {
-      console.log('Speech results:', e);
-      setRecognizedText(e.value[0]); // Set recognized text to state
+    Voice.onSpeechResults = async (e: any) => {
+      await Voice.stop();
+      setIsListening(false);
+      setRecognizedText(e.value[0]);
     };
 
     return () => {
