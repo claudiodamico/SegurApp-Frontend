@@ -4,7 +4,11 @@ import {
   HubConnectionBuilder,
   LogLevel,
 } from '@microsoft/signalr';
-import {MD3LightTheme as DefaultTheme, PaperProvider} from 'react-native-paper';
+import {
+  MD3LightTheme as DefaultTheme,
+  PaperProvider,
+  Text,
+} from 'react-native-paper';
 import Navegacion from './components/Navegacion';
 
 const theme = {
@@ -27,6 +31,8 @@ type MessagesReceived = {
     id: number;
     description: string;
   };
+  latitude: number;
+  longitude: number;
 };
 
 function App(): JSX.Element {
@@ -38,6 +44,10 @@ function App(): JSX.Element {
   useEffect(() => {
     createHubConnection();
   }, []);
+
+  useEffect(() => {
+    console.log(messages);
+  }, [messages]);
 
   const createHubConnection = async () => {
     const connection = new HubConnectionBuilder()
@@ -58,15 +68,26 @@ function App(): JSX.Element {
 
   useEffect(() => {
     if (hubConnection) {
-      hubConnection.on('ReceiveMessage', (message, emisor) => {
-        setMessages(prevMessages => [...prevMessages, {message, emisor}]);
-      });
+      hubConnection.on(
+        'ReceiveMessage',
+        (message, emisor, latitude, longitude) => {
+          setMessages(prevMessages => [
+            ...prevMessages,
+            {message, emisor, latitude, longitude},
+          ]);
+        },
+      );
     }
   }, [hubConnection]);
 
   return (
     <PaperProvider theme={theme}>
       <Navegacion />
+      {messages.map((m, i) => (
+        <Text variant="bodyLarge" key={i}>
+          {m.emisor.fullName} {m.message.description} {m.latitude} {m.longitude}
+        </Text>
+      ))}
     </PaperProvider>
   );
 }

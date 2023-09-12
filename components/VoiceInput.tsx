@@ -1,7 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text} from 'react-native';
+import {View, Text, ToastAndroid} from 'react-native';
 import Voice from '@react-native-voice/voice';
 import {Button} from 'react-native-paper';
+import Geolocation from '@react-native-community/geolocation';
+import axios from 'axios';
 
 const VoiceRecognition: React.FC = () => {
   const [recognizedText, setRecognizedText] = useState<string>('');
@@ -27,6 +29,36 @@ const VoiceRecognition: React.FC = () => {
       await Voice.stop();
       setIsListening(false);
       setRecognizedText(e.value[0]);
+      Geolocation.getCurrentPosition(
+        position => {
+          axios({
+            url: 'http://localhost:5152/api/message-users',
+            method: 'POST',
+            data: {
+              emisorId: 1,
+              message: e.value[0],
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            },
+          })
+            .then(() => {
+              ToastAndroid.show(
+                'Mensaje enviado correctamente',
+                ToastAndroid.SHORT,
+              );
+            })
+            .catch(err => {
+              ToastAndroid.show(
+                'Error al enviar el mensaje: ' + err,
+                ToastAndroid.SHORT,
+              );
+            });
+        },
+        error => {
+          console.log(`Error al obtener la ubicación: ${error.message}`);
+        },
+        {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+      );
     };
 
     return () => {
