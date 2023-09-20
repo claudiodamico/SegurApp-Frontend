@@ -1,15 +1,16 @@
-import React, {useEffect, useState} from 'react';
-import {
-  HubConnection,
-  HubConnectionBuilder,
-  LogLevel,
-} from '@microsoft/signalr';
+import React, {useCallback, useEffect, useState} from 'react';
+
 import {
   MD3LightTheme as DefaultTheme,
   PaperProvider,
   Text,
 } from 'react-native-paper';
 import Navegacion from './components/Navegacion';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Login from './components/Login';
+import NavegationReceptor from './components/receptor/NavigationReceptor';
+import Spinner from './components/Spinner';
+import {View} from 'react-native';
 
 const theme = {
   ...DefaultTheme,
@@ -20,74 +21,97 @@ const theme = {
   },
 };
 
-type MessagesReceived = {
-  emisor: {
+type User = {
+  id: number;
+  fullName: string;
+  dni: string;
+  email: string;
+  phone: string;
+  role: {
     id: number;
-    phone: string;
-    fullName: string;
-    dni: string;
-  };
-  message: {
-    id: number;
+    name: string;
     description: string;
   };
-  latitude: number;
-  longitude: number;
+};
+
+const setToken = async () => {
+  try {
+    const user = JSON.stringify({
+      id: 1,
+      fullName: 'Ciro Gargatagli',
+      dni: '12345678',
+      email: 'ciro@gmail.com',
+      phone: '1112345678',
+      role: {
+        id: 1,
+        name: 'Receptor',
+        description: '',
+      },
+    });
+    await AsyncStorage.setItem('session', user);
+  } catch (error) {
+    // Error saving data
+  }
+};
+
+const getToken = async () => {
+  try {
+    const session = await AsyncStorage.getItem('session');
+    return session ? JSON.parse(session) : null;
+  } catch (e) {
+    // error reading value
+  }
 };
 
 function App(): JSX.Element {
-  const [hubConnection, setHubConnection] = useState<HubConnection | null>(
-    null,
-  );
-  const [messages, setMessages] = useState<MessagesReceived[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    createHubConnection();
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    const user = await getToken();
+    setUser(user);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    console.log(messages);
-  }, [messages]);
+    fetchData();
+  }, []);
 
-  const createHubConnection = async () => {
-    const connection = new HubConnectionBuilder()
-      .withUrl('http://localhost:5152/sendMessageHub')
-      .configureLogging(LogLevel.Debug)
-      .build();
+  const login = useCallback(async () => {
+    setLoading(true);
+    await setToken();
+    fetchData();
+    setLoading(false);
+  }, []);
 
-    try {
-      await connection.start().then(() => {
-        console.log('Conexión establecida correctamente');
-      });
-    } catch (error) {
-      console.log(error);
-    }
-
-    setHubConnection(connection);
-  };
-
-  useEffect(() => {
-    if (hubConnection) {
-      hubConnection.on(
-        'ReceiveMessage',
-        (message, emisor, latitude, longitude) => {
-          setMessages(prevMessages => [
-            ...prevMessages,
-            {message, emisor, latitude, longitude},
-          ]);
-        },
-      );
-    }
-  }, [hubConnection]);
+  const logOut = useCallback(async () => {
+    setLoading(true);
+    await AsyncStorage.removeItem('session');
+    setUser(null);
+    setLoading(false);
+  }, []);
 
   return (
     <PaperProvider theme={theme}>
-      <Navegacion />
-      {messages.map((m, i) => (
-        <Text variant="bodyLarge" key={i}>
-          {m.emisor.fullName} {m.message.description} {m.latitude} {m.longitude}
-        </Text>
-      ))}
+      {loading ? (
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            flex: 1,
+          }}>
+          <Spinner />
+        </View>
+      ) : user ? (
+        user.role.name == 'Emisor' ? (
+          <Navegacion logOut={logOut} />
+        ) : (
+          <NavegationReceptor logOut={logOut} />
+        )
+      ) : (
+        <Login login={login} />
+      )}
     </PaperProvider>
   );
 }

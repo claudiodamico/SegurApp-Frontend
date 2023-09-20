@@ -8,7 +8,7 @@ const Home = () => <VoiceRecognition />;
 const NotificationsRoute = () => <Text>Notifications</Text>;
 const MapRoute = () => <MiMapa />;
 
-const Navegacion = () => {
+const Navegacion = ({logOut}: {logOut: () => void}) => {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     {
@@ -41,6 +41,7 @@ const Navegacion = () => {
     <>
       <Appbar.Header>
         <Appbar.Content title={routes[index].title} />
+        <Appbar.Action icon="logout" onPress={() => logOut()} />
       </Appbar.Header>
       <BottomNavigation
         navigationState={{index, routes}}
