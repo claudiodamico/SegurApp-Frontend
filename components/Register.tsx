@@ -46,7 +46,10 @@ const Register = ({goBack}: {goBack: () => void}) => {
         alignItems: 'center',
         flex: 1,
       }}>
-      <Text variant="titleMedium"> Sign up to start sending alerts</Text>
+      <Text variant="titleMedium">
+        {' '}
+        Registrate para comenzar a enviar alertas
+      </Text>
       <View
         style={{
           width: '85%',
@@ -60,7 +63,7 @@ const Register = ({goBack}: {goBack: () => void}) => {
           }}
         />
         <TextInput
-          label="Password"
+          label="Contraseña"
           value={password}
           onChangeText={v => setPassword(v)}
           secureTextEntry
@@ -69,7 +72,7 @@ const Register = ({goBack}: {goBack: () => void}) => {
           }}
         />
         <TextInput
-          label="Phone"
+          label="Teléfono"
           value={phone}
           onChangeText={v => setPhone(v)}
           style={{
@@ -88,13 +91,13 @@ const Register = ({goBack}: {goBack: () => void}) => {
           mode="contained"
           style={{marginTop: 20}}
           onPress={() => register()}>
-          Sign Up
+          Registrarse
         </Button>
         <Button
           mode="outlined"
           style={{marginTop: 20}}
           onPress={() => goBack()}>
-          Back
+          Volver
         </Button>
       </View>
     </View>

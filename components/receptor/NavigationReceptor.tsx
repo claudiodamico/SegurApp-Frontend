@@ -7,20 +7,20 @@ import {
 } from '@microsoft/signalr';
 import Home from './Home';
 
-const Notifications = () => <Text>Notifications</Text>;
+const Notificaciones = () => <Text>Notifications</Text>;
 
 const NavegationReceptor = ({logOut}: {logOut: () => void}) => {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     {
       key: 'home',
-      title: 'Home',
+      title: 'Inicio',
       focusedIcon: 'home',
       unfocusedIcon: 'home-outline',
     },
     {
       key: 'notifications',
-      title: 'Notifications',
+      title: 'Notificaciones',
       focusedIcon: 'bell',
       unfocusedIcon: 'bell-outline',
     },
@@ -85,7 +85,7 @@ const NavegationReceptor = ({logOut}: {logOut: () => void}) => {
             case 'home':
               return <Home messages={messages} />;
             case 'notifications':
-              return <Notifications />;
+              return <Notificaciones />;
           }
         }}
       />

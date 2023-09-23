@@ -5,7 +5,7 @@ import MiMapa from './MiMapa';
 
 const Home = () => <VoiceRecognition />;
 
-const NotificationsRoute = () => <Text>Notifications</Text>;
+const NotificationsRoute = () => <Text>Notificaciones</Text>;
 const MapRoute = () => <MiMapa />;
 
 const Navegacion = ({logOut}: {logOut: () => void}) => {
@@ -13,19 +13,19 @@ const Navegacion = ({logOut}: {logOut: () => void}) => {
   const [routes] = React.useState([
     {
       key: 'home',
-      title: 'Home',
+      title: 'Inicio',
       focusedIcon: 'home',
       unfocusedIcon: 'home-outline',
     },
     {
       key: 'notifications',
-      title: 'Notifications',
+      title: 'Notificaciones',
       focusedIcon: 'bell',
       unfocusedIcon: 'bell-outline',
     },
     {
       key: 'map',
-      title: 'Map',
+      title: 'Mapa',
       focusedIcon: 'map-marker',
       unfocusedIcon: 'map-marker-outline',
     },

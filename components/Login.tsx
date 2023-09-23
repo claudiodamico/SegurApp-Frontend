@@ -17,7 +17,7 @@ const Login = ({login}: {login: () => void}) => {
         alignItems: 'center',
         flex: 1,
       }}>
-      <Text variant="titleMedium"> Sign in to start issuing alerts</Text>
+      <Text variant="titleMedium">¡Inicia sesión para estar seguro!</Text>
       <View
         style={{
           width: '85%',
@@ -45,13 +45,13 @@ const Login = ({login}: {login: () => void}) => {
           mode="contained"
           style={{marginTop: 20}}
           onPress={() => login()}>
-          Sign In
+          Iniciar sesión
         </Button>
         <Button
           mode="outlined"
           style={{marginTop: 20}}
           onPress={() => setPage('register')}>
-          Sign Up
+          Registrarse
         </Button>
       </View>
     </View>
