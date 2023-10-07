@@ -7,20 +7,10 @@ import {SafeAreaView, StyleSheet, ToastAndroid, View} from 'react-native';
 // Import Map and Marker
 import MapView, {Marker} from 'react-native-maps';
 import {PERMISSIONS, RESULTS, check, request} from 'react-native-permissions';
+import Spinner from './Spinner';
 
 const MiMapa = () => {
-  const [position, setPosition] = useState<GeolocationResponse>({
-    coords: {
-      accuracy: 5,
-      altitude: 0,
-      heading: 0,
-      latitude: -34.80876333333333,
-      longitude: -58.183141666666664,
-      altitudeAccuracy: null,
-      speed: 0,
-    },
-    timestamp: 1694480745574,
-  });
+  const [position, setPosition] = useState<GeolocationResponse | null>(null);
 
   useEffect(() => {
     const requestLocationPermission = async () => {
@@ -43,6 +33,11 @@ const MiMapa = () => {
           );
           if (permissionResult === RESULTS.GRANTED) {
             fetchCurrentPosition();
+            while (true) {
+              setTimeout(() => {
+                fetchCurrentPosition();
+              }, 5000);
+            }
           } else {
             ToastAndroid.show(
               'No se puede acceder a la ubicación',
@@ -69,6 +64,19 @@ const MiMapa = () => {
       {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
     );
   };
+
+  if (!position) {
+    return (
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          flex: 1,
+        }}>
+        <Spinner />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={{flex: 1}}>

@@ -41,17 +41,17 @@ const VoiceRecognition: React.FC = () => {
       await Voice.stop();
       setIsListening(false);
       setRecognizedText(e.value[0]);
-      if (
-        messages.find(
-          message =>
-            message.description.toUpperCase() == e.value[0].toUpperCase(),
-        )
-      ) {
-        sendMessage(e.value[0]);
-      } else {
-        ToastAndroid.show('Palabra inválida', ToastAndroid.SHORT);
-        setLoading(false);
-      }
+      sendMessage(e.value[0]);
+      //   if (
+      //   messages.find(
+      //     message =>
+      //       message.description.toUpperCase() == e.value[0].toUpperCase(),
+      //   )
+      // ) {
+      // } else {
+      //   ToastAndroid.show('Palabra inválida', ToastAndroid.SHORT);
+      //   setLoading(false);
+      // }
     };
 
     return () => {
@@ -147,6 +147,7 @@ const VoiceRecognition: React.FC = () => {
           }}>
           {messages.map(message => (
             <Text
+              key={message.id}
               style={{
                 marginTop: 10,
                 marginLeft: 15,

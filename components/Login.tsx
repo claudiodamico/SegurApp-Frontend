@@ -2,9 +2,10 @@ import React, {useState} from 'react';
 import {Button, Text, TextInput} from 'react-native-paper';
 import {View} from 'react-native';
 import Register from './Register';
+import axios, {AxiosResponse} from 'axios';
 
-const Login = ({login}: {login: () => void}) => {
-  const [dni, setDni] = useState('');
+const Login = ({login}: {login: (email: string, password: string) => void}) => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [page, setPage] = useState('login');
 
@@ -24,9 +25,10 @@ const Login = ({login}: {login: () => void}) => {
         }}>
         <TextInput
           mode="outlined"
-          label="DNI"
-          value={dni}
-          onChangeText={v => setDni(v)}
+          label="Email"
+          value={email}
+          onChangeText={v => setEmail(v)}
+          inputMode="email"
           style={{
             marginTop: 15,
           }}
@@ -44,7 +46,7 @@ const Login = ({login}: {login: () => void}) => {
         <Button
           mode="contained"
           style={{marginTop: 20}}
-          onPress={() => login()}>
+          onPress={() => login(email, password)}>
           Iniciar sesión
         </Button>
         <Button

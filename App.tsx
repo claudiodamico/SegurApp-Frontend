@@ -11,6 +11,11 @@ import Login from './components/Login';
 import NavegationReceptor from './components/receptor/NavigationReceptor';
 import Spinner from './components/Spinner';
 import {View} from 'react-native';
+import axios, {AxiosError, AxiosResponse} from 'axios';
+import jwt from 'jwt-decode'; // import dependency
+import {sha256} from 'react-native-sha256';
+import {getToken, setToken} from './utils/react-storage';
+import {ToastAndroid} from 'react-native';
 
 const theme = {
   ...DefaultTheme,
@@ -19,48 +24,6 @@ const theme = {
     primary: 'blue',
     secondary: 'yellow',
   },
-};
-
-type User = {
-  id: number;
-  fullName: string;
-  dni: string;
-  email: string;
-  phone: string;
-  role: {
-    id: number;
-    name: string;
-    description: string;
-  };
-};
-
-const setToken = async () => {
-  try {
-    const user = JSON.stringify({
-      id: 1,
-      fullName: 'Ciro Gargatagli',
-      dni: '12345678',
-      email: 'ciro@gmail.com',
-      phone: '1112345678',
-      role: {
-        id: 1,
-        name: 'Receptor',
-        description: '',
-      },
-    });
-    await AsyncStorage.setItem('session', user);
-  } catch (error) {
-    // Error saving data
-  }
-};
-
-const getToken = async () => {
-  try {
-    const session = await AsyncStorage.getItem('session');
-    return session ? JSON.parse(session) : null;
-  } catch (e) {
-    // error reading value
-  }
 };
 
 function App(): JSX.Element {
@@ -78,12 +41,41 @@ function App(): JSX.Element {
     fetchData();
   }, []);
 
-  const login = useCallback(async () => {
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+
+  const login = async (email: string, password: string) => {
     setLoading(true);
-    await setToken();
-    fetchData();
-    setLoading(false);
-  }, []);
+    axios({
+      url: 'http://10.0.2.2:5152/api/user/Login',
+      method: 'POST',
+      data: {
+        user: email,
+        password: await sha256(password),
+      },
+    })
+      .then((res: AxiosResponse<{message: string; jwt: string}>) => {
+        const jwtDecoded = jwt(res.data.jwt) as {
+          User: string;
+          exp: number;
+          aud: string;
+          uss: string;
+          nbf: number;
+        };
+        const userLogged = JSON.parse(jwtDecoded.User);
+        setUser(userLogged);
+        setToken(userLogged);
+      })
+      .catch((err: AxiosError<{message: string; jwt: string}>) => {
+        ToastAndroid.show(
+          err.response?.data.message ||
+            'En este momento la aplicación no está disponible',
+          ToastAndroid.SHORT,
+        );
+      })
+      .finally(() => setLoading(false));
+  };
 
   const logOut = useCallback(async () => {
     setLoading(true);
@@ -104,7 +96,7 @@ function App(): JSX.Element {
           <Spinner />
         </View>
       ) : user ? (
-        user.role.name == 'Emisor' ? (
+        user.RoleId == 1 ? (
           <Navegacion logOut={logOut} />
         ) : (
           <NavegationReceptor logOut={logOut} />

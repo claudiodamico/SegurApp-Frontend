@@ -4,22 +4,25 @@ import {View} from 'react-native';
 import {ToastAndroid} from 'react-native';
 import axios from 'axios';
 import Spinner from './Spinner';
+import {sha256} from 'react-native-sha256';
 
 const Register = ({goBack}: {goBack: () => void}) => {
+  const [fullName, setFullName] = useState('');
   const [dni, setDni] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const register = () => {
+  const register = async () => {
     setLoading(true);
     axios({
-      url: 'http://10.0.2.2:5152/api/message-users',
+      url: 'http://10.0.2.2:5152/api/user',
       method: 'POST',
       data: {
+        fullName,
         dni,
-        password,
+        password: await sha256(password),
         phone,
         email,
       },
@@ -29,10 +32,7 @@ const Register = ({goBack}: {goBack: () => void}) => {
         goBack();
       })
       .catch(err => {
-        ToastAndroid.show(
-          'Error al registrarse el mensaje: ' + err,
-          ToastAndroid.SHORT,
-        );
+        ToastAndroid.show('Error al registrarse: ' + err, ToastAndroid.SHORT);
       })
       .finally(() => setLoading(false));
   };
@@ -54,6 +54,14 @@ const Register = ({goBack}: {goBack: () => void}) => {
         style={{
           width: '85%',
         }}>
+        <TextInput
+          label="Nombre completo"
+          value={fullName}
+          onChangeText={v => setFullName(v)}
+          style={{
+            marginTop: 15,
+          }}
+        />
         <TextInput
           label="DNI"
           value={dni}
