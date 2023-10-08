@@ -41,10 +41,6 @@ function App(): JSX.Element {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
-
   const login = async (email: string, password: string) => {
     setLoading(true);
     axios({

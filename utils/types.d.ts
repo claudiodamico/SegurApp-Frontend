@@ -11,6 +11,7 @@ type MessageReceived = {
   };
   latitude: number;
   longitude: number;
+  occurredAt: Date;
 };
 
 type User = {
@@ -25,4 +26,9 @@ type User = {
     name: string;
     description: string;
   };
+};
+
+type Message = {
+  id: number;
+  description: string;
 };

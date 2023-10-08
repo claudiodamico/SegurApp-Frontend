@@ -58,6 +58,7 @@ const Register = ({goBack}: {goBack: () => void}) => {
           label="Nombre completo"
           value={fullName}
           onChangeText={v => setFullName(v)}
+          inputMode="text"
           style={{
             marginTop: 15,
           }}
@@ -66,6 +67,7 @@ const Register = ({goBack}: {goBack: () => void}) => {
           label="DNI"
           value={dni}
           onChangeText={v => setDni(v)}
+          inputMode="numeric"
           style={{
             marginTop: 15,
           }}
@@ -75,6 +77,7 @@ const Register = ({goBack}: {goBack: () => void}) => {
           value={password}
           onChangeText={v => setPassword(v)}
           secureTextEntry
+          right={<TextInput.Icon icon="eye" />}
           style={{
             marginTop: 15,
           }}
@@ -83,6 +86,7 @@ const Register = ({goBack}: {goBack: () => void}) => {
           label="Teléfono"
           value={phone}
           onChangeText={v => setPhone(v)}
+          inputMode="tel"
           style={{
             marginTop: 15,
           }}
@@ -91,6 +95,7 @@ const Register = ({goBack}: {goBack: () => void}) => {
           label="Email"
           value={email}
           onChangeText={v => setEmail(v)}
+          inputMode="email"
           style={{
             marginTop: 15,
           }}

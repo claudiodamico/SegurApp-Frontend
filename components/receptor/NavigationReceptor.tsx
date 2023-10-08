@@ -6,6 +6,7 @@ import {
   LogLevel,
 } from '@microsoft/signalr';
 import Home from './Home';
+import {addHours} from 'date-fns';
 
 const Notificaciones = () => <Text>Notifications</Text>;
 
@@ -61,10 +62,23 @@ const NavegationReceptor = ({logOut}: {logOut: () => void}) => {
     if (hubConnection) {
       hubConnection.on(
         'ReceiveMessage',
-        (message, emisor, latitude, longitude) => {
+        (message, emisor, latitude, longitude, occurredAt) => {
+          const actualDate = addHours(new Date(), -3).getTime();
+          const dateReceived = new Date(occurredAt).getTime();
+          console.info(
+            'Retardo total en llegar a destino: ',
+            dateReceived - actualDate,
+            ' milisegundos',
+          );
           setMessages(prevMessages => [
             ...prevMessages,
-            {message, emisor, latitude, longitude},
+            {
+              message,
+              emisor,
+              latitude,
+              longitude,
+              occurredAt: new Date(occurredAt),
+            },
           ]);
         },
       );
@@ -83,7 +97,7 @@ const NavegationReceptor = ({logOut}: {logOut: () => void}) => {
         renderScene={({route, jumpTo}) => {
           switch (route.key) {
             case 'home':
-              return <Home messages={messages} />;
+              return <Home messages={messages} setMessages={setMessages} />;
             case 'notifications':
               return <Notificaciones />;
           }

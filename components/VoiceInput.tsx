@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {View, ToastAndroid} from 'react-native';
 import Voice from '@react-native-voice/voice';
 import {Button, Card, Chip, Text} from 'react-native-paper';
@@ -6,21 +6,15 @@ import Geolocation from '@react-native-community/geolocation';
 import axios, {AxiosResponse} from 'axios';
 import Spinner from './Spinner';
 import {getColorAlert, getIconAlert} from '../utils/colors';
-
-type Message = {
-  id: number;
-  description: string;
-};
+import {getToken} from '../utils/react-storage';
+import {addHours} from 'date-fns';
 
 const VoiceRecognition: React.FC = () => {
-  const [recognizedText, setRecognizedText] = useState<string>('');
   const [isListening, setIsListening] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
-    fetchMessages();
-
     // Initialize the voice recognition module
     Voice.onSpeechStart = () => {
       console.log('Speech started');
@@ -37,27 +31,34 @@ const VoiceRecognition: React.FC = () => {
     Voice.onSpeechError = e => {};
 
     Voice.onSpeechResults = async (e: any) => {
+      console.info('Palabra recibida: ', e.value[0]);
       setLoading(true);
       await Voice.stop();
       setIsListening(false);
-      setRecognizedText(e.value[0]);
-      sendMessage(e.value[0]);
-      //   if (
-      //   messages.find(
-      //     message =>
-      //       message.description.toUpperCase() == e.value[0].toUpperCase(),
-      //   )
-      // ) {
-      // } else {
-      //   ToastAndroid.show('Palabra inválida', ToastAndroid.SHORT);
-      //   setLoading(false);
-      // }
+
+      console.log(messages);
+
+      const message = messages.find(
+        message =>
+          message.description.toUpperCase() == e.value[0].toUpperCase(),
+      );
+
+      if (message) {
+        sendMessage(message);
+      } else {
+        ToastAndroid.show('Palabra inválida', ToastAndroid.SHORT);
+        setLoading(false);
+      }
     };
 
     return () => {
       // Cleanup and stop voice recognition when the component unmounts
       Voice.destroy().then(Voice.removeAllListeners);
     };
+  }, []);
+
+  useEffect(() => {
+    fetchMessages();
   }, []);
 
   const toggleListening = async () => {
@@ -74,30 +75,41 @@ const VoiceRecognition: React.FC = () => {
     }
   };
 
-  const fetchMessages = () => {
+  const fetchMessages = useCallback(async () => {
     axios({
       url: 'http://10.0.2.2:5152/api/message',
       method: 'GET',
     })
       .then((res: AxiosResponse<Message[]>) => {
+        console.log(res.data);
         setMessages(res.data);
       })
       .catch(err => {
         console.log('Error al cargar el listado de mensajes: ', err);
       });
-  };
+  }, []);
 
-  const sendMessage = (message: string) => {
+  const sendMessage = async (message: Message) => {
+    setLoading(true);
+    const user = await getToken();
+    var startTime = performance.now();
     Geolocation.getCurrentPosition(
       position => {
+        var endTime = performance.now();
+        console.info(
+          `Obtener la ubicación: ${endTime - startTime} milisegundos.`,
+        );
+
+        startTime = performance.now();
         axios({
           url: 'http://10.0.2.2:5152/api/message-users',
           method: 'POST',
           data: {
-            emisorId: 1,
+            emisorId: user.Id,
             message: message,
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
+            occurredAt: addHours(new Date(), -3),
           },
         })
           .then(() => {
@@ -112,7 +124,15 @@ const VoiceRecognition: React.FC = () => {
               ToastAndroid.SHORT,
             );
           })
-          .finally(() => setLoading(false));
+          .finally(() => {
+            endTime = performance.now();
+            console.info(
+              `Enviar petición al backend: ${
+                endTime - startTime
+              } milisegundos.`,
+            );
+            setLoading(false);
+          });
       },
       error => {
         setLoading(false);
@@ -145,14 +165,16 @@ const VoiceRecognition: React.FC = () => {
             flexWrap: 'wrap',
             marginTop: 10,
           }}>
-          {messages.map(message => (
+          {messages.map((message, i) => (
             <Text
-              key={message.id}
+              key={i}
               style={{
                 marginTop: 10,
                 marginLeft: 15,
               }}>
-              <Chip icon={getIconAlert(message.description)}>
+              <Chip
+                icon={getIconAlert(message.description)}
+                onPress={() => sendMessage(message)}>
                 {' '}
                 {message.description}
               </Chip>

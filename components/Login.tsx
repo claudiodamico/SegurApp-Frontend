@@ -2,12 +2,12 @@ import React, {useState} from 'react';
 import {Button, Text, TextInput} from 'react-native-paper';
 import {View} from 'react-native';
 import Register from './Register';
-import axios, {AxiosResponse} from 'axios';
 
 const Login = ({login}: {login: (email: string, password: string) => void}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [page, setPage] = useState('login');
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   const goBack = () => setPage('login');
 
@@ -38,7 +38,14 @@ const Login = ({login}: {login: (email: string, password: string) => void}) => {
           mode="outlined"
           value={password}
           onChangeText={v => setPassword(v)}
-          secureTextEntry
+          secureTextEntry={secureTextEntry}
+          inputMode="text"
+          right={
+            <TextInput.Icon
+              icon="eye"
+              onPress={() => setSecureTextEntry(!secureTextEntry)}
+            />
+          }
           style={{
             marginTop: 15,
           }}

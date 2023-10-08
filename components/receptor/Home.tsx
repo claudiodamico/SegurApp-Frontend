@@ -3,14 +3,21 @@ import Geolocation, {
 } from '@react-native-community/geolocation';
 import {useEffect, useState} from 'react';
 import {StyleSheet, ToastAndroid, View, Image} from 'react-native';
-import MapView, {Marker} from 'react-native-maps';
+import MapView, {Callout, Marker} from 'react-native-maps';
 import {PERMISSIONS, RESULTS, check, request} from 'react-native-permissions';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Spinner from '../Spinner';
-import {IconButton, MD2Colors} from 'react-native-paper';
+import {Button, IconButton, MD2Colors} from 'react-native-paper';
 import {getColorAlert, getIconAlert} from '../../utils/colors';
+import {format} from 'date-fns';
 
-const Home = ({messages}: {messages: MessageReceived[]}) => {
+const Home = ({
+  messages,
+  setMessages,
+}: {
+  messages: MessageReceived[];
+  setMessages: (messages: MessageReceived[]) => void;
+}) => {
   const [position, setPosition] = useState<GeolocationResponse | null>(null);
 
   useEffect(() => {
@@ -80,31 +87,31 @@ const Home = ({messages}: {messages: MessageReceived[]}) => {
           customMapStyle={mapStyle}>
           <Marker
             pinColor={MD2Colors.blue300}
-            draggable
             coordinate={{
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
             }}
-            onDragEnd={e =>
-              console.log(JSON.stringify(e.nativeEvent.coordinate))
-            }
             title={'Tu ubicación'}
             description={'Esta es tu ubicación'}
           />
-          {messages.map(message => (
+          {messages.map((message, i) => (
             <Marker
               pinColor={getColorAlert(message.message.description)}
-              key={message.emisor.id}
+              key={i}
               draggable
               coordinate={{
                 latitude: message.latitude,
                 longitude: message.longitude,
               }}
-              onDragEnd={e =>
-                console.log(JSON.stringify(e.nativeEvent.coordinate))
+              onDragStart={() =>
+                setMessages(messages.filter((v, index) => index != i))
               }
-              title={message.emisor.fullName}
-              description={message.message.description}>
+              title={message.message.description}
+              description={
+                format(message.occurredAt, 'dd/MM/yyyy kk:mm:ss') +
+                ' - ' +
+                message.emisor.fullName
+              }>
               <IconButton
                 icon={getIconAlert(message.message.description)}
                 iconColor={getColorAlert(message.message.description)}
